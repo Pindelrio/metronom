@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:pindelrio.com)",
+      "Bash(curl -s \"https://pindelrio.com/\")",
+      "Bash(curl -s \"https://pindelrio.com/assets/index-B5fM_zKp.css\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Projectes\\\\Metronom\" -Recurse -Force)",
+      "Bash(Select-Object -Property FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "Bash(npm --version)",
+      "Bash(npm show *)",
+      "Bash(npx create-expo-app@latest . --template blank-typescript)",
+      "Bash(npx create-expo-app@latest _tmp --template blank-typescript)",
+      "Bash(Get-ChildItem -Name)",
+      "Bash(cp -r _tmp/App.tsx _tmp/app.json _tmp/index.ts _tmp/package.json _tmp/package-lock.json _tmp/tsconfig.json .)",
+      "Bash(cp -r _tmp/assets/* assets/)",
+      "Bash(cp -r _tmp/assets .)",
+      "Bash(npm install *)",
+      "Bash(npx expo *)",
+      "Bash(curl -L \"https://storage.googleapis.com/gpt-engineer-file-uploads/E9nuoXTVYhTCRvMfXAoDZ85YRty1/uploads/1761593919866-Logo-Pin.png\" -o assets/icon.png)",
+      "Bash(npx tsc *)",
+      "Bash(npm uninstall *)",
+      "Bash(gh auth *)",
+      "PowerShell(gh auth status 2>&1)",
+      "PowerShell(winget install GitHub.cli --accept-source-agreements --accept-package-agreements 2>&1)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); gh --version)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); gh auth status 2>&1)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}
