@@ -7,6 +7,9 @@ web-build/
 *.p12
 *.key
 *.mobileprovision
+credentials.json
+google-services.json
+google-play-service-account*.json
 *.orig.*
 npm-debug.*
 yarn-debug.*

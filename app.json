@@ -29,7 +29,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0F172A"
       },
-      "package": "com.pindelrio.metronom"
+      "package": "com.pindelrio.metronom",
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -47,6 +53,12 @@
       "expo-audio",
       "expo-font",
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "76081011-dc82-4bdb-8e06-7b425a732f5c"
+      }
+    },
+    "owner": "pindelrio"
   }
 }
