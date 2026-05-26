@@ -1,10 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { BRAND_BLUE, TEXT_PRIMARY, TEXT_SECONDARY } from '../../constants/colors';
 import { RADIUS_MD, SPACING_SM } from '../../constants/layout';
 import { useMetronomeStore } from '../../store/metronomeStore';
 import { TimeSignature } from '../../types';
-import { SecondaryText } from '../ui/Typography';
 
 const OPTIONS: TimeSignature[] = [2, 3, 4, 6];
 const LABELS: Record<TimeSignature, string> = {
@@ -20,7 +20,7 @@ export function TimeSignaturePicker() {
 
   return (
     <View style={styles.container}>
-      <SecondaryText style={styles.title}>Compàs</SecondaryText>
+      <Ionicons name="time-outline" size={18} color={TEXT_SECONDARY} style={styles.title} />
       <View style={styles.row}>
         {OPTIONS.map((opt) => (
           <Pressable
@@ -41,10 +41,10 @@ export function TimeSignaturePicker() {
 const styles = StyleSheet.create({
   container: {
     marginVertical: 4,
+    alignItems: 'center',
   },
   title: {
     marginBottom: SPACING_SM,
-    textAlign: 'center',
   },
   row: {
     flexDirection: 'row',

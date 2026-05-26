@@ -1,15 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { BRAND_BLUE, TEXT_PRIMARY, TEXT_SECONDARY } from '../../constants/colors';
 import { RADIUS_MD, SPACING_SM } from '../../constants/layout';
 import { useMetronomeStore } from '../../store/metronomeStore';
 import { SoundVariant } from '../../types';
-import { SecondaryText } from '../ui/Typography';
 
-const OPTIONS: { variant: SoundVariant; label: string }[] = [
-  { variant: 'classic', label: 'Clàssic' },
-  { variant: 'wood', label: 'Fusta' },
-  { variant: 'digital', label: 'Digital' },
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+const OPTIONS: { variant: SoundVariant; icon: IoniconName }[] = [
+  { variant: 'classic', icon: 'musical-notes-outline' },
+  { variant: 'wood',    icon: 'leaf-outline' },
+  { variant: 'digital', icon: 'pulse-outline' },
 ];
 
 export function SoundPicker() {
@@ -18,17 +20,19 @@ export function SoundPicker() {
 
   return (
     <View style={styles.container}>
-      <SecondaryText style={styles.title}>So</SecondaryText>
+      <Ionicons name="volume-medium-outline" size={18} color={TEXT_SECONDARY} style={styles.title} />
       <View style={styles.row}>
-        {OPTIONS.map(({ variant: v, label }) => (
+        {OPTIONS.map(({ variant: v, icon }) => (
           <Pressable
             key={v}
             style={[styles.pill, variant === v && styles.activePill]}
             onPress={() => setVariant(v)}
           >
-            <Text style={[styles.pillText, variant === v && styles.activePillText]}>
-              {label}
-            </Text>
+            <Ionicons
+              name={icon}
+              size={20}
+              color={variant === v ? TEXT_PRIMARY : TEXT_SECONDARY}
+            />
           </Pressable>
         ))}
       </View>
@@ -39,15 +43,15 @@ export function SoundPicker() {
 const styles = StyleSheet.create({
   container: {
     marginVertical: 4,
+    alignItems: 'center',
   },
   title: {
     marginBottom: SPACING_SM,
-    textAlign: 'center',
   },
   row: {
     flexDirection: 'row',
     gap: SPACING_SM,
-    justifyContent: 'center',
+    alignSelf: 'stretch',
   },
   pill: {
     flex: 1,
@@ -61,13 +65,5 @@ const styles = StyleSheet.create({
   activePill: {
     backgroundColor: BRAND_BLUE,
     borderColor: BRAND_BLUE,
-  },
-  pillText: {
-    color: TEXT_SECONDARY,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  activePillText: {
-    color: TEXT_PRIMARY,
   },
 });

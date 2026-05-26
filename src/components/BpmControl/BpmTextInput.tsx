@@ -52,8 +52,6 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE_BPM,
     fontWeight: '700',
     textAlign: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: BRAND_BLUE,
     paddingHorizontal: 16,
     minWidth: 140,
   },

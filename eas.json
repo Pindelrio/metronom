@@ -19,6 +19,9 @@
     },
     "production": {
       "autoIncrement": true,
+      "ios": {
+        "distribution": "store"
+      },
       "android": {
         "buildType": "app-bundle"
       }
@@ -27,6 +30,7 @@
   "submit": {
     "production": {
       "android": {
+        "serviceAccountKeyPath": "./google-service-account.json",
         "track": "production",
         "releaseStatus": "draft"
       }

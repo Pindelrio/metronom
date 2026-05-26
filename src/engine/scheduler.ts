@@ -6,6 +6,7 @@ const SCHEDULE_AHEAD_SEC = 0.1;
 export class MetronomeScheduler {
   private bpm: number = 100;
   private beatsPerMeasure: number = 4;
+  private pendingBeatsPerMeasure: number | null = null;
   private beatIndex: number = 0;
   private nextBeatTime: number = 0;
   private timerHandle: ReturnType<typeof setInterval> | null = null;
@@ -17,6 +18,7 @@ export class MetronomeScheduler {
     this.stop();
     this.bpm = bpm;
     this.beatsPerMeasure = beatsPerMeasure;
+    this.pendingBeatsPerMeasure = null;
     this.onBeat = onBeat;
     this.beatIndex = 0;
 
@@ -42,8 +44,12 @@ export class MetronomeScheduler {
   }
 
   setBeatsPerMeasure(beats: number): void {
-    this.beatsPerMeasure = beats;
-    this.beatIndex = 0;
+    if (this.timerHandle !== null) {
+      this.pendingBeatsPerMeasure = beats;
+    } else {
+      this.beatsPerMeasure = beats;
+      this.beatIndex = 0;
+    }
   }
 
   isRunning(): boolean {
@@ -53,6 +59,14 @@ export class MetronomeScheduler {
   private tick(): void {
     const now = Date.now() / 1000;
     const beatDuration = 60 / this.bpm;
+
+    // If nextBeatTime fell far behind (JS throttled in background), skip
+    // missed beats to avoid scheduling a burst on foreground resume.
+    if (this.nextBeatTime < now - SCHEDULE_AHEAD_SEC) {
+      const missedBeats = Math.floor((now - SCHEDULE_AHEAD_SEC - this.nextBeatTime) / beatDuration) + 1;
+      this.beatIndex = (this.beatIndex + missedBeats) % this.beatsPerMeasure;
+      this.nextBeatTime += missedBeats * beatDuration;
+    }
 
     while (this.nextBeatTime < now + SCHEDULE_AHEAD_SEC) {
       const delay = Math.max(0, this.nextBeatTime - now);
@@ -65,6 +79,11 @@ export class MetronomeScheduler {
 
       this.beatIndex = (this.beatIndex + 1) % this.beatsPerMeasure;
       this.nextBeatTime += beatDuration;
+
+      if (this.beatIndex === 0 && this.pendingBeatsPerMeasure !== null) {
+        this.beatsPerMeasure = this.pendingBeatsPerMeasure;
+        this.pendingBeatsPerMeasure = null;
+      }
     }
   }
 }
