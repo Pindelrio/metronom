@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Animated } from 'react-native';
+import { Animated, AppState } from 'react-native';
 import { MetronomeScheduler } from '../engine/scheduler';
 import { useMetronomeStore } from '../store/metronomeStore';
 import { SoundBank } from './useSoundLoader';
@@ -45,6 +45,24 @@ export function useMetronome(soundBankRef: React.RefObject<SoundBank | null>) {
     }
     return () => scheduler.stop();
   }, [isPlaying]);
+
+  // JS timers are throttled or suspended while the app is in background, so
+  // pause the scheduler there and restart it cleanly when the app comes back.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      const scheduler = schedulerRef.current;
+      const { isPlaying: playing, bpm: currentBpm, timeSignature: currentTs } =
+        useMetronomeStore.getState();
+      if (state === 'active') {
+        if (playing && !scheduler.isRunning()) {
+          scheduler.start(currentBpm, currentTs, (idx) => handleBeatRef.current(idx));
+        }
+      } else {
+        scheduler.stop();
+      }
+    });
+    return () => sub.remove();
+  }, []);
 
   useEffect(() => {
     if (isPlaying) schedulerRef.current.setBpm(bpm);

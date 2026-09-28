@@ -2,6 +2,11 @@ export type BeatCallback = (beatIndex: number) => void;
 
 const LOOKAHEAD_MS = 25;
 const SCHEDULE_AHEAD_SEC = 0.1;
+// A beat whose timer fires later than this is dropped instead of played.
+// When the JS thread is throttled or suspended (app in background, screen
+// locked), pending timers all fire at once on resume; playing them would
+// produce a burst of accumulated clicks.
+const MAX_LATE_SEC = 0.05;
 
 export class MetronomeScheduler {
   private bpm: number = 100;
@@ -10,9 +15,8 @@ export class MetronomeScheduler {
   private beatIndex: number = 0;
   private nextBeatTime: number = 0;
   private timerHandle: ReturnType<typeof setInterval> | null = null;
+  private pendingBeats = new Set<ReturnType<typeof setTimeout>>();
   private onBeat: BeatCallback | null = null;
-  private startWallTime: number = 0;
-  private startBeatTime: number = 0;
 
   start(bpm: number, beatsPerMeasure: number, onBeat: BeatCallback): void {
     this.stop();
@@ -21,11 +25,7 @@ export class MetronomeScheduler {
     this.pendingBeatsPerMeasure = null;
     this.onBeat = onBeat;
     this.beatIndex = 0;
-
-    const now = Date.now() / 1000;
-    this.startWallTime = now;
-    this.startBeatTime = now;
-    this.nextBeatTime = now;
+    this.nextBeatTime = Date.now() / 1000;
 
     this.timerHandle = setInterval(() => this.tick(), LOOKAHEAD_MS);
     this.tick();
@@ -36,6 +36,9 @@ export class MetronomeScheduler {
       clearInterval(this.timerHandle);
       this.timerHandle = null;
     }
+    // Cancel beats already handed to setTimeout so none play after stopping.
+    this.pendingBeats.forEach((handle) => clearTimeout(handle));
+    this.pendingBeats.clear();
     this.onBeat = null;
   }
 
@@ -71,10 +74,17 @@ export class MetronomeScheduler {
     while (this.nextBeatTime < now + SCHEDULE_AHEAD_SEC) {
       const delay = Math.max(0, this.nextBeatTime - now);
       const beatIdx = this.beatIndex;
+      const beatTime = this.nextBeatTime;
       const cb = this.onBeat;
 
       if (cb) {
-        setTimeout(() => cb(beatIdx), delay * 1000);
+        const handle = setTimeout(() => {
+          this.pendingBeats.delete(handle);
+          if (this.onBeat !== cb) return;
+          if (Date.now() / 1000 - beatTime > MAX_LATE_SEC) return;
+          cb(beatIdx);
+        }, delay * 1000);
+        this.pendingBeats.add(handle);
       }
 
       this.beatIndex = (this.beatIndex + 1) % this.beatsPerMeasure;
